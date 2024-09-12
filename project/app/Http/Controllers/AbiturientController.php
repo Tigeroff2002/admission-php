@@ -8,8 +8,12 @@ use Illuminate\Support\MessageBag;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use App\Models\Abiturient;
+use Symfony\Component\HttpFoundation\Response;
+use App\Contracts\Requests\RegisterRequest;
 
-use App\Models\RawUser;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
 
 class AbiturientController extends Controller
 {
@@ -18,6 +22,10 @@ class AbiturientController extends Controller
         return new JsonResponse("{empty_endpoint}");
     }
 
+    /**
+     * @Route("/login", methods={"POST"})
+     *
+     */
     public function loginPost(SerializerInterface $serializer, Request $request) : JsonResponse
     {
         $request->validate([
@@ -41,5 +49,18 @@ class AbiturientController extends Controller
 
         $data = $serializer->serialize($existed_user, JsonEncoder::FORMAT);
         return new JsonResponse($data, Response::HTTP_OK, [], true);
+    }
+
+    public function registerPost(SerializerInterface $serializer, Request $request) : JsonResponse
+    {
+        $content = $request->getContent();
+
+        $answer = json_decode($content, true);
+
+        if (isset($answer)){
+            $answer['email'] = 'kirill.parakhin@altenar.com';
+        }
+
+        return new JsonResponse($answer);
     }
 }
