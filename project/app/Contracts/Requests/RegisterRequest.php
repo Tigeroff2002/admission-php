@@ -2,18 +2,23 @@
 
 namespace App\Contracts\Requests;
 
-use Symfony\Component\Serializer\Annotation\Groups;
-
-
-class RegisterDto
+class RegisterRequest
 {
-    public $email;
+    public string $email;
 
-    public $password;
+    public string $password;
 
-    public $first_name;
+    public string $first_name;
 
-    public $second_name;
+    public string $second_name;
 
-    public $is_admin;
+    public boolean $is_admin;
+
+    function __construct($email, $password, $first_name, $second_name, $is_admin) {
+        $this->email = $email;
+        $this->password = $password;
+        $this->first_name = $first_name;
+        $this->second_name = $second_name;
+        $this->is_admin = $is_admin;
+      }
 }

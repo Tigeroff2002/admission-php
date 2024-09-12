@@ -10,6 +10,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 use App\Models\Abiturient;
 use Symfony\Component\HttpFoundation\Response;
 use App\Contracts\Requests\RegisterRequest;
+use App\Contracts\Requests\LoginRequest;
 
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
@@ -58,7 +59,12 @@ class AbiturientController extends Controller
         $answer = json_decode($content, true);
 
         if (isset($answer)){
-            $answer['email'] = 'kirill.parakhin@altenar.com';
+            $answer->validate([
+                'email' => 'required', 
+                'password' => 'required', 
+                'first_name' => 'required',
+                'second_name' => 'required', 
+                'is_admin' => 'required']);
         }
 
         return new JsonResponse($answer);
