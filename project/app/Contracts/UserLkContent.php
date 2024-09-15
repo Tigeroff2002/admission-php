@@ -13,16 +13,16 @@ class UserLkContent extends Content
 
     public string $email;
 
-    public boolean $has_diplom_original;
+    public bool $has_diplom_original;
 
-    public DirectionLinksList $directions;
+    public array $directions_links;
 
-    public function __construct($first_name, $second_name, $email, $has_diplom_original, $directions)
+    public function __construct($first_name, $second_name, $email, $has_diplom_original, $directions_links)
     {
         $this->first_name = $first_name;
         $this->second_name = $second_name;
         $this->email = $email;
         $this->has_diplom_original = $has_diplom_original;
-        $this->directions = $directions;
+        $this->directions_links = $directions_links;
     }
 }

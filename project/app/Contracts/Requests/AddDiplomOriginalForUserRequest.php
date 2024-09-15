@@ -10,7 +10,7 @@ class AddDiplomOriginalForUserRequest
 
     public string $token;
 
-    public boolean $has_diplom_original;
+    public bool $has_diplom_original;
 
     function __construct($abiturient_id, $target_abiturient_id, $token, $has_diplom_original) {
         $this->abiturient_id = $abiturient_id;

@@ -5,11 +5,12 @@ namespace App\Contracts;
 use App\Contracts\Content;
 use App\Contracts\DirectionPrioritetLinksList;
 
-class DirectionPrioritetsContent extends Content
+
+class DirectionsPrioritetsContent extends Content
 {
     public int $target_abiturient_id;
 
-    public boolean $has_diplom_original;
+    public bool $has_diplom_original;
 
     public DirectionPrioritetLinksList $prioritets;
 

@@ -10,11 +10,11 @@ class GetDirectionSnapshotResponse
 
     public string $token;
 
-    public DirectionSnapshotContent $content;
+    public ?DirectionSnapshotContent $content;
 
-    public string $failure_message;
+    public ?string $failure_message;
 
-    public boolean $result;
+    public bool $result;
 
     function __construct($abiturient_id, $token, $content, $failure_message, $result) {
         $this->abiturient_id = $abiturient_id;

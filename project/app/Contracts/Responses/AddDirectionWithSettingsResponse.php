@@ -12,11 +12,11 @@ class AddDirectionWithSettingsResponse
 
     public int $direction_id;
 
-    public Content $content;
+    public ?Content $content;
 
-    public string $failure_message;
+    public ?string $failure_message;
 
-    public boolean $result;
+    public bool $result;
 
     function __construct($abiturient_id, $token, $direction_id, $content, $failure_message, $result) {
         $this->abiturient_id = $abiturient_id;

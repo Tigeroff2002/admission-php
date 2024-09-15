@@ -6,19 +6,13 @@ use App\Contracts\Content;
 
 class DefaultResponse
 {
-    public int $abiturient_id;
+    public ?Content $content;
 
-    public string $token;
+    public ?string $failure_message;
 
-    public Content $content;
+    public bool $result;
 
-    public string $failure_message;
-
-    public boolean $result;
-
-    function __construct($abiturient_id, $token, $content, $failure_message, $result) {
-        $this->abiturient_id = $abiturient_id;
-        $this->token = $token;
+    function __construct($content, $failure_message, $result) {
         $this->content = $content;
         $this->failure_message = $failure_message;
         $this->result = $result;

@@ -16,7 +16,7 @@ class PlaceSnapshot
 
     public int $priotitet_number;
 
-    public boolean $has_diplom_original;
+    public bool $has_diplom_original;
 
     function __construct($place, $abiturient_id, $abiturient_name, $mark, $admission_status, $priotitet_number, $has_diplom_original) 
     {
