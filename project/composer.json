@@ -9,6 +9,7 @@
         "doctrine/annotations": "^2.0",
         "laravel/framework": "^11.9",
         "laravel/tinker": "^2.9",
+        "predis/predis": "^2.2",
         "symfony/property-access": "^7.1",
         "symfony/property-info": "^7.1",
         "symfony/serializer": "^7.1",

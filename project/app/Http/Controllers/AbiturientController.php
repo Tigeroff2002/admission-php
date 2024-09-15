@@ -22,6 +22,7 @@ use App\Contracts\Requests\LoginRequest;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
+use Illuminate\Support\Facades\Redis;
 
 use App\Contracts\Responses\DefaultResponse;
 
@@ -176,6 +177,13 @@ class AbiturientController extends Controller
 
         $abiturient_id = $array['abiturient_id'];
 
+        $cached_value = Redis::get(1);
+
+        if (isset($cached_value))
+        {
+            return new JsonResponse($cached_value, Response::HTTP_OK, [], true);   
+        }
+
         $existed_user = Abiturient::where('id', $abiturient_id)->first();
 
         $directions_links_db = AbiturientDirectionLink::where('abiturient_id', $abiturient_id)->get();
@@ -217,6 +225,10 @@ class AbiturientController extends Controller
             null, 
             true);
 
-        return new JsonResponse(json_encode($responseModel), Response::HTTP_OK, [], true);   
+        $jsonResponse = json_encode($responseModel);
+
+        Redis::set($abiturient_id, $jsonResponse);
+
+        return new JsonResponse($jsonResponse, Response::HTTP_OK, [], true);   
     }
 }
