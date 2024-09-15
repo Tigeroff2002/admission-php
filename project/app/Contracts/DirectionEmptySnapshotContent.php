@@ -11,7 +11,7 @@ class DirectionEmptySnapshotContent extends Content
 
     public string $direction_caption;
 
-    public AbiturientEmptyMarksList $abiturients;
+    public array $abiturients;
 
     public function __construct($direction_id, $direction_caption, $abiturients)
     {

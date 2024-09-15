@@ -11,7 +11,7 @@ class DirectionSnapshotContent extends Content
 
     public string $direction_caption;
 
-    public PlaceSnapshotsList $places;
+    public array $places;
 
     public function __construct($direction_id, $direction_caption, $places)
     {
