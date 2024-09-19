@@ -80,6 +80,8 @@ class AbiturientController extends Controller
             'second_name' => $array['second_name'],
             'is_admin' => $array['is_admin'],
             'has_diplom_original' => false,
+            'is_requested' => false,
+            'is_enrolled' => false,
             'token' => $token
         ]);
 
@@ -199,10 +201,8 @@ class AbiturientController extends Controller
 
         $directions_links = array();
 
-        for ($i = 0; $i < count($directions_links_db); $i++)
+        foreach($directions_links_db as $current_item)
         {
-            $current_item = $directions_links_db[$i];
-
             $direction_id = $current_item['direction_id'];
 
             $direction = Direction::where('id', $direction_id)->first();
@@ -260,10 +260,8 @@ class AbiturientController extends Controller
 
         $directions = array();
 
-        for ($i = 0; $i < count($directions_db); $i++)
+        foreach ($directions_db as $current_item)
         {
-            $current_item = $directions_db[$i];
-
             $directionLink = new DirectionShortLink($current_item['id'], $current_item['caption']);
 
             array_push($directions, $directionLink);
@@ -308,10 +306,8 @@ class AbiturientController extends Controller
 
         $places = array();
 
-        for ($i = 0; $i < count($places_db); $i++)
+        foreach ($places_db as $current_item)
         {
-            $current_item = $places_db[$i];
-
             $abiturient_name = Abiturient::where('id', $current_item['abiturient_id'])->first();
 
             $place = new PlaceSnapshot(

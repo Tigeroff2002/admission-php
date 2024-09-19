@@ -13,7 +13,14 @@ Route::post('/lk', [AbiturientController::class, 'getUserLKContent']);
 Route::post('/directions', [AbiturientController::class, 'getAllDirections']);
 Route::post('/directions/:id    ', [AbiturientController::class, 'getDirectionSnapshot']);
 
-Route::post('/abiturients', [AdminController::class, 'getAllAbiturients']);
+Route::post('/directions/addNew', [AdminController::class, 'addNewDirection']);
+Route::post('/abiturients/addInfo', [AdminController::class, 'addAbiturientLinks']);
+Route::post('/abiturients/addOriginalDiplom', [AdminController::class, 'addOriginalDiplom']);
+
+Route::post('/abiturients/all', [AdminController::class, 'getAllAbiturients']);
+Route::post('/abiturients/requested', [AdminController::class, 'getRequestedAbiturients']);
+Route::post('/abiturients/enrolled', [AdminController::class, 'getEnrolledAbiturients']);
+
 Route::post('/directions/getEmpty', [AdminController::class, 'getDirectionEmptySnapshot']);
 Route::post('/directions/fillMarks', [AdminController::class, 'fillDirectionMarks']);
 Route::post('/directions/finalize', [AdminController::class, 'directionFinalize']);
