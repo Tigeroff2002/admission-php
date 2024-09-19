@@ -6,33 +6,16 @@ use App\Contracts\AbiturientEmptyMark;
 use App\Contracts\AbiturientLink;
 use App\Contracts\AllAbiturientsContent;
 use App\Contracts\DirectionEmptySnapshotContent;
-use App\Contracts\DirectionLink;
-use App\Contracts\DirectionLinksList;
-use App\Contracts\DirectionShortLink;
-use App\Contracts\DirectionsShortContent;
 use App\Contracts\Responses\AddDirectionWithSettingsResponse;
 use App\Contracts\Responses\GetAllAbiturientsResponse;
 use App\Contracts\Responses\GetDirectionEmptyResultsResponse;
-use App\Contracts\Responses\GetDirectionsResponse;
-use App\Contracts\Responses\GetUserLkContentResponse;
-use App\Contracts\Responses\ResponseWithId;
-use App\Contracts\UserLkContent;
 use App\Models\AbiturientDirectionLink;
 use App\Models\Direction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\MessageBag;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Serializer\SerializerInterface;
 use App\Models\Abiturient;
 use Symfony\Component\HttpFoundation\Response;
-use App\Contracts\Requests\RegisterRequest;
-use App\Contracts\Requests\LoginRequest;
-
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Symfony\Component\Serializer\Serializer;
-use Illuminate\Support\Facades\Redis;
 
 use App\Contracts\Responses\DefaultResponse;
 
@@ -176,6 +159,10 @@ class AdminController extends Controller
         DB::update('update abiturients set is_requested = ? where id = ?',
          [true, $target_abiturient_id]);
 
+        $redisCacheActualizer = new RedisCacheActualizer();
+
+        $redisCacheActualizer->ActualizeCache($target_abiturient_id,  false);
+
         $successResponseModel = new DefaultResponse(
             null,
             null,
@@ -230,6 +217,10 @@ class AdminController extends Controller
 
         DB::update('update abiturients set has_diplom_original = ? where id = ?',
          [$has_diplom_original, $target_abiturient_id]);
+
+         $redisCacheActualizer = new RedisCacheActualizer();
+
+         $redisCacheActualizer->ActualizeCache($target_abiturient_id,  false);
 
         $successResponseModel = new DefaultResponse(
             null,
@@ -496,7 +487,7 @@ class AdminController extends Controller
                 array_push($newAbiturients, $existedAbiturient);
             }
 
-            for ($i = 0; $i < count($newAbiturients); $i++)
+/*             for ($i = 0; $i < count($newAbiturients); $i++)
             {
                 for ($j = $i + 1; $j < count($abiturientsMarks) - 1; $j++)
                 {
@@ -509,23 +500,35 @@ class AdminController extends Controller
                         $newAbiturients[$j] = $temp;
                     }
                 }
-            }
+            } */
+
+            usort($newAbiturients, function ($item1, $item2){
+                return $item2['mark'] <=> $item1['mark'];
+            });
 
             DB::delete('delete from abiturient_direction_links where direction_id = ?', [$direction_id]);
 
-            for ($i = 0; $i < count($newAbiturients); $i++)
+            $place_number = 1;
+
+            $redisCacheActualizer = new RedisCacheActualizer();
+
+            foreach ($newAbiturients as $newAbiturient)
             {
                 $newAbiturientLink = new AbiturientDirectionLink([
-                    'abiturient_id' => $newAbiturients[$i]['abiturient_id'],
-                    'direction_id' => $newAbiturients[$i]['direction_id'],
-                    'mark' => $newAbiturients[$i]['mark'],
-                    'place' => $i + 1,
-                    'admission_status' => $newAbiturients[$i]['admission_status'],
-                    'prioritet_number' => $newAbiturients[$i]['prioritet_number'],
-                    'has_diplom_original' => $newAbiturients[$i]['has_diplom_original'],
+                    'abiturient_id' => $newAbiturient['abiturient_id'],
+                    'direction_id' => $newAbiturient['direction_id'],
+                    'mark' => $newAbiturient['mark'],
+                    'place' => $place_number,
+                    'admission_status' => $newAbiturient['admission_status'],
+                    'prioritet_number' => $newAbiturient['prioritet_number'],
+                    'has_diplom_original' => $newAbiturient['has_diplom_original'],
                 ]);
 
                 $newAbiturientLink->save();
+
+                $place_number++;
+
+                $redisCacheActualizer->ActualizeCache($newAbiturient['abiturient_id'],  false);
             }
 
             DB::update('update directions set is_filled = ? where id = ?', [true, $direction_id]);
@@ -622,6 +625,8 @@ class AdminController extends Controller
 
             array_push($new_places, $currentPlace);
         }
+
+        $redisCacheActualizer = new RedisCacheActualizer();
         
         foreach($new_places as $newPlace)
         {
@@ -633,6 +638,8 @@ class AdminController extends Controller
             {
                 DB::update('update abiturients set is_enrolled = ? where id = ?',
                  [true, $newPlace['abiturient_id']]);
+
+                $redisCacheActualizer->ActualizeCache($newPlace['abiturient_id'],  false);
             }
         }
 

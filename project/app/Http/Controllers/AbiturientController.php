@@ -2,35 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Contracts\AbiturientLink;
-use App\Contracts\AllAbiturientsContent;
-use App\Contracts\DirectionLink;
-use App\Contracts\DirectionLinksList;
 use App\Contracts\DirectionShortLink;
 use App\Contracts\DirectionSnapshotContent;
 use App\Contracts\DirectionsShortContent;
-use App\Contracts\Responses\GetAllAbiturientsResponse;
 use App\Contracts\Responses\GetDirectionSnapshotResponse;
 use App\Contracts\Responses\GetDirectionsResponse;
-use App\Contracts\Responses\GetUserLkContentResponse;
 use App\Contracts\Responses\ResponseWithId;
-use App\Contracts\UserLkContent;
 use App\Models\AbiturientDirectionLink;
 use App\Models\Direction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\MessageBag;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Serializer\SerializerInterface;
 use App\Models\Abiturient;
 use App\Contracts\PlaceSnapshot;
 use Symfony\Component\HttpFoundation\Response;
-use App\Contracts\Requests\RegisterRequest;
-use App\Contracts\Requests\LoginRequest;
-
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Symfony\Component\Serializer\Serializer;
 use Illuminate\Support\Facades\Redis;
 
 use App\Contracts\Responses\DefaultResponse;
@@ -188,57 +173,16 @@ class AbiturientController extends Controller
 
         $abiturient_id = $array['abiturient_id'];
 
-        $cached_value = Redis::get(1);
+        $cached_value = Redis::get($abiturient_id);
 
         if (isset($cached_value))
         {
             return new JsonResponse($cached_value, Response::HTTP_OK, [], true);   
         }
 
-        $existed_user = Abiturient::where('id', $abiturient_id)->first();
+        $redisCacheActualizer = new RedisCacheActualizer();
 
-        $directions_links_db = AbiturientDirectionLink::where('abiturient_id', $abiturient_id)->get();
-
-        $directions_links = array();
-
-        foreach($directions_links_db as $current_item)
-        {
-            $direction_id = $current_item['direction_id'];
-
-            $direction = Direction::where('id', $direction_id)->first();
-
-            $directionLink = 
-                new DirectionLink(
-                    $direction_id, 
-                    $direction['caption'], 
-                    $current_item['place'], 
-                    $current_item['mark'], 
-                    $current_item['admission_status'],
-                    $current_item['prioritet_number']);
-
-            array_push($directions_links, $directionLink);
-        }
-
-        $directionsLinksContent = new UserLkContent(
-            $existed_user['first_name'], 
-            $existed_user['second_name'],
-            $existed_user['email'],
-            $existed_user['has_diplom_original'],
-            $directions_links
-        );
-
-        $responseModel = new GetUserLkContentResponse(
-            $abiturient_id, 
-            $array['token'], 
-            $directionsLinksContent, 
-            null, 
-            true);
-
-        $jsonResponse = json_encode($responseModel);
-
-        Redis::set($abiturient_id, $jsonResponse);
-
-        return new JsonResponse($jsonResponse, Response::HTTP_OK, [], true);   
+        return $redisCacheActualizer->ActualizeCache($abiturient_id,  true);
     }
 
     public function getAllDirections(Request $request) : ?JsonResponse
