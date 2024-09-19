@@ -31,6 +31,8 @@ class RedisCacheActualizer
 
         $directions_links_db = AbiturientDirectionLink::where('abiturient_id', $abiturient_id)->get();
 
+        error_log(count( $directions_links_db));
+
         $directions_links = array();
 
         foreach($directions_links_db as $current_item)

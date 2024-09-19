@@ -4,9 +4,10 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 
-header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Origin: http://localhost:3001');
 header('Access-Control-Allow-Methods: *');
 header('Access-Control-Allow-Headers: *');
+header('Content-Type: application/json');
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(

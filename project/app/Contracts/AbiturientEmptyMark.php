@@ -4,9 +4,9 @@ namespace App\Contracts;
 
 class AbiturientEmptyMark
 {
-    public string $abiturient_id;
+    public int $abiturient_id;
 
-    public int $abiturient_name;
+    public string $abiturient_name;
 
     public int $mark;
 

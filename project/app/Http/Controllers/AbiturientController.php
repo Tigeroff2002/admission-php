@@ -51,7 +51,7 @@ class AbiturientController extends Controller
                 'User with email ' . $user_email . ' is already existed',
                 false);
 
-            return new JsonResponse(json_encode($failResponseModel), Response::HTTP_BAD_REQUEST, [], true);
+            return new JsonResponse(json_encode($failResponseModel), Response::HTTP_OK, [], true);
         }
 
         $guid = new GUID();
@@ -76,7 +76,13 @@ class AbiturientController extends Controller
 
         $abiturient_id = $created_abiturient['id'];
 
-        $successResponseModel = new ResponseWithId($abiturient_id, $token, null, null, true);
+        $successResponseModel = new ResponseWithId(
+            $abiturient_id, 
+            $token, 
+            $array['is_admin'],
+            null, 
+            null, 
+            true);
 
         return new JsonResponse(json_encode($successResponseModel), Response::HTTP_OK, [], true);
     }
@@ -109,7 +115,7 @@ class AbiturientController extends Controller
                 'User with email ' . $user_email . ' is not already existed',
                 false);
 
-            return new JsonResponse(json_encode($failResponseModel), Response::HTTP_BAD_REQUEST, $this->headers, true);
+            return new JsonResponse(json_encode($failResponseModel), Response::HTTP_OK, [], true);
         }
 
         if ($existed_user['password'] != $user_password)
@@ -119,7 +125,7 @@ class AbiturientController extends Controller
                 'Passwords not equals',
                 false);
 
-            return new JsonResponse(json_encode($failResponseModel), Response::HTTP_BAD_REQUEST, $this->headers, true);
+            return new JsonResponse(json_encode($failResponseModel), Response::HTTP_OK, [], true);
         }
 
         $guid = new GUID();
@@ -128,9 +134,15 @@ class AbiturientController extends Controller
 
         DB::update('update abiturients set token = ?', [$token]);
 
-        $successResponseModel = new ResponseWithId($existed_user['id'], $token, null, null, true);
+        $successResponseModel = new ResponseWithId(
+            $existed_user['id'],
+            $token,
+            $existed_user['is_admin'],
+            null,
+            null,
+            true);
 
-        return new JsonResponse(json_encode($successResponseModel), Response::HTTP_OK, $this->headers, true);
+        return new JsonResponse(json_encode($successResponseModel), Response::HTTP_OK, [], true);
     }
 
     public function logoutPost(Request $request) : ?JsonResponse
@@ -150,7 +162,8 @@ class AbiturientController extends Controller
         
         $successResponseModel = new ResponseWithId(
             $array['abiturient_id'], 
-            $array['token'], 
+            $array['token'],
+            false,
             null, 
             null, 
             true);

@@ -54,7 +54,7 @@ class AdminController extends Controller
                 'Direction with caption ' . $direction_caption . ' is already exists',
                 false);
 
-            return new JsonResponse(json_encode($failResponseModel), Response::HTTP_BAD_REQUEST, [], true);
+            return new JsonResponse(json_encode($failResponseModel), Response::HTTP_OK, [], true);
         }
 
         $newDirection = new Direction([
@@ -108,7 +108,7 @@ class AdminController extends Controller
                 'Target abiturient with id ' . $target_abiturient_id . ' not already exists',
                 false);
 
-            return new JsonResponse(json_encode($failResponseModel), Response::HTTP_BAD_REQUEST, [], true);
+            return new JsonResponse(json_encode($failResponseModel), Response::HTTP_OK, [], true);
         }
 
         if ($targetAbiturient['is_requested'] == true)
@@ -118,7 +118,7 @@ class AdminController extends Controller
                 'Target abiturient with id ' . $target_abiturient_id . ' is already requested to directions',
                 false);
 
-            return new JsonResponse(json_encode($failResponseModel), Response::HTTP_BAD_REQUEST, [], true);
+            return new JsonResponse(json_encode($failResponseModel), Response::HTTP_OK, [], true);
         }
 
         $has_diplom_original = $content['has_diplom_original'];
@@ -141,7 +141,7 @@ class AdminController extends Controller
                     'Direction with id ' . $direction_id . ' not already exists',
                     false);
     
-                return new JsonResponse(json_encode($failResponseModel), Response::HTTP_BAD_REQUEST, [], true);
+                return new JsonResponse(json_encode($failResponseModel), Response::HTTP_OK, [], true);
             }
 
             $db_link = new AbiturientDirectionLink([
@@ -200,7 +200,7 @@ class AdminController extends Controller
                 'Target abiturient with id ' . $target_abiturient_id . ' not already exists',
                 false);
 
-            return new JsonResponse(json_encode($failResponseModel), Response::HTTP_BAD_REQUEST, [], true);
+            return new JsonResponse(json_encode($failResponseModel), Response::HTTP_OK, [], true);
         }
 
         if ($targetAbiturient['is_requested'] == false)
@@ -210,7 +210,7 @@ class AdminController extends Controller
                 'Target abiturient with id ' . $target_abiturient_id . ' was not already requested to directions',
                 false);
 
-            return new JsonResponse(json_encode($failResponseModel), Response::HTTP_BAD_REQUEST, [], true);
+            return new JsonResponse(json_encode($failResponseModel), Response::HTTP_OK, [], true);
         }
 
         $has_diplom_original = $content['has_diplom_original'];
@@ -251,11 +251,18 @@ class AdminController extends Controller
 
         foreach($abiturients_db as $current_item)
         {
-            $full_name = $current_item['first_name'] . ' ' . $current_item['second_name'];
+            if ($current_item['is_admin'] == false)
+            {
+                $full_name = $current_item['first_name'] . ' ' . $current_item['second_name'];
 
-            $abiturientLink = new AbiturientLink($current_item['id'], $full_name);
-
-            array_push($abiturients, $abiturientLink);
+                $abiturientLink = new AbiturientLink(
+                    $current_item['id'], 
+                    $full_name,
+                    $current_item['is_requested'],
+                    $current_item['is_enrolled']);
+    
+                array_push($abiturients, $abiturientLink);
+            }
         }
 
         $abiturientsContent = new AllAbiturientsContent($abiturients);
@@ -293,11 +300,18 @@ class AdminController extends Controller
 
         foreach($abiturients_db as $current_item)
         {
-            $full_name = $current_item['first_name'] . ' ' . $current_item['second_name'];
+            if ($current_item['is_admin'] == false)
+            {
+                $full_name = $current_item['first_name'] . ' ' . $current_item['second_name'];
 
-            $abiturientLink = new AbiturientLink($current_item['id'], $full_name);
-
-            array_push($abiturients, $abiturientLink);
+                $abiturientLink = new AbiturientLink(
+                    $current_item['id'], 
+                    $full_name,
+                    $current_item['is_requested'],
+                    $current_item['is_enrolled']);
+    
+                array_push($abiturients, $abiturientLink);
+            }
         }
 
         $abiturientsContent = new AllAbiturientsContent($abiturients);
@@ -335,11 +349,18 @@ class AdminController extends Controller
 
         foreach($abiturients_db as $current_item)
         {
-            $full_name = $current_item['first_name'] . ' ' . $current_item['second_name'];
+            if ($current_item['is_admin'] == false)
+            {
+                $full_name = $current_item['first_name'] . ' ' . $current_item['second_name'];
 
-            $abiturientLink = new AbiturientLink($current_item['id'], $full_name);
-
-            array_push($abiturients, $abiturientLink);
+                $abiturientLink = new AbiturientLink(
+                    $current_item['id'], 
+                    $full_name,
+                    $current_item['is_requested'],
+                    $current_item['is_enrolled']);
+    
+                array_push($abiturients, $abiturientLink);
+            }
         }
 
         $abiturientsContent = new AllAbiturientsContent($abiturients);
@@ -407,6 +428,7 @@ class AdminController extends Controller
         return new JsonResponse($jsonResponse, Response::HTTP_OK, [], true);   
     }
 
+    // https://stackoverflow.com/questions/66025194/php-laravel-frontend-how-to-upload-send-csv-file-to-backend-api
     public function fillDirectionMarks(Request $request) : ?JsonResponse
     {
         $basicAuthentificator = new BasicAuthentificator();
@@ -437,7 +459,7 @@ class AdminController extends Controller
                     'Direction with id ' . strval($direction_id) . ' was already filled with exam marks',
                     false);
     
-                return new JsonResponse(json_encode($failResponseModel), Response::HTTP_BAD_REQUEST, [], true);           
+                return new JsonResponse(json_encode($failResponseModel), Response::HTTP_OK, [], true);           
             }
         }
 
@@ -547,7 +569,7 @@ class AdminController extends Controller
                 'Some abiturients from input list are not existed',
                 false);
 
-            return new JsonResponse(json_encode($failResponseModel), Response::HTTP_BAD_REQUEST, [], true);
+            return new JsonResponse(json_encode($failResponseModel), Response::HTTP_OK, [], true);
         }
     }
 
@@ -577,7 +599,7 @@ class AdminController extends Controller
                 'Direction with id ' . strval($direction_id) . ' does not exist',
                 false);
 
-            return new JsonResponse(json_encode($failResponseModel), Response::HTTP_BAD_REQUEST, [], true);  
+            return new JsonResponse(json_encode($failResponseModel), Response::HTTP_OK, [], true);  
         }
 
         if ($direction['is_filled'] == false)
@@ -587,7 +609,7 @@ class AdminController extends Controller
                 'Direction with id ' . strval($direction_id) . ' was not already filled with exam marks',
                 false);
 
-            return new JsonResponse(json_encode($failResponseModel), Response::HTTP_BAD_REQUEST, [], true);           
+            return new JsonResponse(json_encode($failResponseModel), Response::HTTP_OK, [], true);           
         }
 
         if ($direction['is_finalized'] == true)
@@ -597,7 +619,7 @@ class AdminController extends Controller
                 'Direction with id ' . strval($direction_id) . ' was already finalized',
                 false);
 
-            return new JsonResponse(json_encode($failResponseModel), Response::HTTP_BAD_REQUEST, [], true);           
+            return new JsonResponse(json_encode($failResponseModel), Response::HTTP_OK, [], true);           
         }
 
         $places_db = AbiturientDirectionLink::where('direction_id', $direction_id)->get();
