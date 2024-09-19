@@ -318,6 +318,7 @@ class AbiturientController extends Controller
                 $current_item['place'], 
                 $current_item['abiturient_id'], 
                 $abiturient_name,
+                $current_item['mark'],
                 $current_item['admission_status'],
                 $current_item['prioritet_number'],
                 $current_item['has_diplom_original']);

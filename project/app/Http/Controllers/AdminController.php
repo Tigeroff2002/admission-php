@@ -111,10 +111,8 @@ class AdminController extends Controller
 
         $places = array();
 
-        for ($i = 0; $i < count($places_db); $i++)
+        foreach ($places_db as $current_item)
         {
-            $current_item = $places_db[$i];
-
             $abiturient_name = Abiturient::where('id', $current_item['abiturient_id'])->first();
 
             $place = new AbiturientEmptyMark(
@@ -139,9 +137,77 @@ class AdminController extends Controller
         return new JsonResponse($jsonResponse, Response::HTTP_OK, [], true);   
     }
 
-    function compare($a, $b)
+    public function fillDirectionMarks(Request $request) : ?JsonResponse
     {
-        return $a['mark'] > $b['mark'];
+        $basicAuthentificator = new BasicAuthentificator();
+
+        $auth_result = $basicAuthentificator->IsUserExistsAndTokenValidAndAdmin($request);
+
+        if ($auth_result != null)
+        {
+            return $auth_result;
+        }
+        
+        $json = $request->getContent();
+
+        $array = json_decode($json, true);
+
+        $content = $array['content'];
+
+        $direction_id = $content['direction_id'];
+
+        $abiturientsMarks = $content['abiturients'];
+
+        $existedAbiturients = AbiturientDirectionLink::where('direction_id', $direction_id)->get();
+
+        $is_request_validated_bydb = true;
+
+        foreach ($abiturientsMarks as $abiturientUpdated)
+        {
+            $abiturientExisted = false;
+
+            foreach ($existedAbiturients as $abiturient)
+            {
+                if ($abiturient['abiturient_id'] == $abiturientUpdated['abiturient_id'])
+                {
+                    $abiturientExisted = true;
+
+                    break;
+                }
+            }
+
+            if ($abiturientExisted == false)
+            {
+                $is_request_validated_bydb = false;
+                break;
+            }
+        }
+
+        if ($is_request_validated_bydb == true)
+        {
+            foreach ($abiturientsMarks as $abiturientUpdated)
+            {
+                DB::update(
+                    'update abiturient_direction_links set mark = ? where direction_id = ? and abiturient_id = ?',
+                    [$abiturientUpdated['mark'], $direction_id, $abiturientUpdated['abiturient_id']]);
+            }
+
+            $successResponseModel = new DefaultResponse(
+                null,
+                null,
+                true);
+
+            return new JsonResponse(json_encode($successResponseModel), Response::HTTP_OK, [], true);
+        }
+        else 
+        {
+            $failResponseModel = new DefaultResponse(
+                null,
+                'Some abiturients from input list are not existed',
+                false);
+
+            return new JsonResponse(json_encode($failResponseModel), Response::HTTP_BAD_REQUEST, [], true);
+        }
     }
 
     public function directionFinalize(Request $request) : ?JsonResponse
@@ -169,34 +235,66 @@ class AdminController extends Controller
 
         $direction = Direction::where('id', $direction_id)->first();
 
+        if (!isset($direction))
+        {
+            $failResponseModel = new DefaultResponse(
+                null,
+                'Direction with id ' . strval($direction_id) . ' does not exist',
+                false);
+
+            return new JsonResponse(json_encode($failResponseModel), Response::HTTP_BAD_REQUEST, [], true);  
+        }
+
+        if ($direction['is_finalized'] == true)
+        {
+            $failResponseModel = new DefaultResponse(
+                null,
+                'Direction with id ' . strval($direction_id) . ' was already finalized',
+                false);
+
+            return new JsonResponse(json_encode($failResponseModel), Response::HTTP_BAD_REQUEST, [], true);           
+        }
+
         $direction_budget_count = $direction['budget_places_number'];
         $min_ball = $direction['min_ball'];
 
-        for ($i = 0; $i < count($places_db); $i++)
+        $number = 0;
+
+        $new_places = array();
+
+        foreach ($places as $currentPlace)
         {
-            $current_item = $places_db[$i];
+            if ($currentPlace['has_diplom_original'] == true 
+                && $currentPlace['mark'] >= $min_ball 
+                && $number < $direction_budget_count)
+                {
+                    $currentPlace['admission_status'] = 'enrolled';
+                }
+            else 
+            {
+                $currentPlace['failed'] = 'enrolled';
+            }
 
-            $abiturient_name = Abiturient::where('id', $current_item['abiturient_id'])->first();
+            array_push($new_places, $currentPlace);
+        } 
 
-            $place = new AbiturientEmptyMark(
-                $current_item['abiturient_id'], 
-                $abiturient_name,
-                0);
+        DB::delete('delete from abiturient_direction_links where direction_id = ?', [$direction_id]);
 
-            array_push($places, $place);
+        foreach ($new_places as $newCurrentPlace)
+        {
+            $newCurrentPlace->save();
         }
 
-        $placesContent = new DirectionEmptySnapshotContent($direction_id, $direction_name, $places);
-
-        $responseModel = new GetDirectionEmptyResultsResponse(
-            $array['abiturient_id'], 
-            $array['token'], 
-            $placesContent, 
-            null, 
+        $successResponseModel = new DefaultResponse(
+            null,
+            null,
             true);
 
-        $jsonResponse = json_encode($responseModel);
+        return new JsonResponse(json_encode($successResponseModel), Response::HTTP_OK, [], true); 
+    }
 
-        return new JsonResponse($jsonResponse, Response::HTTP_OK, [], true);   
+    function compare($a, $b)
+    {
+        return $a['mark'] > $b['mark'];
     }
 }
