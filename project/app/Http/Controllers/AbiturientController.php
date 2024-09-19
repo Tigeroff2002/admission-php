@@ -95,6 +95,8 @@ class AbiturientController extends Controller
 
         $array = json_decode($json, true);
 
+        error_log('we are here 1');
+
         $user_email = $array['email'];
         $user_password = $array['password'];
 
@@ -107,7 +109,7 @@ class AbiturientController extends Controller
                 'User with email ' . $user_email . ' is not already existed',
                 false);
 
-            return new JsonResponse(json_encode($failResponseModel), Response::HTTP_BAD_REQUEST, [], true);
+            return new JsonResponse(json_encode($failResponseModel), Response::HTTP_BAD_REQUEST, $this->headers, true);
         }
 
         if ($existed_user['password'] != $user_password)
@@ -117,7 +119,7 @@ class AbiturientController extends Controller
                 'Passwords not equals',
                 false);
 
-            return new JsonResponse(json_encode($failResponseModel), Response::HTTP_BAD_REQUEST, [], true);
+            return new JsonResponse(json_encode($failResponseModel), Response::HTTP_BAD_REQUEST, $this->headers, true);
         }
 
         $guid = new GUID();
@@ -128,7 +130,7 @@ class AbiturientController extends Controller
 
         $successResponseModel = new ResponseWithId($existed_user['id'], $token, null, null, true);
 
-        return new JsonResponse(json_encode($successResponseModel), Response::HTTP_OK, [], true);
+        return new JsonResponse(json_encode($successResponseModel), Response::HTTP_OK, $this->headers, true);
     }
 
     public function logoutPost(Request $request) : ?JsonResponse
@@ -279,4 +281,6 @@ class AbiturientController extends Controller
 
         return new JsonResponse($jsonResponse, Response::HTTP_OK, [], true);   
     }
+
+    private $headers = ['Content-Type' => 'application/json', 'Access-Control-Allow-Origin' => '*'];
 }
