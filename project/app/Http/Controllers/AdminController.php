@@ -93,6 +93,8 @@ class AdminController extends Controller
         
         $json = $request->getContent();
 
+        error_log($json);
+
         $array = json_decode($json, true);
 
         $content = $array['content'];
@@ -123,7 +125,7 @@ class AdminController extends Controller
 
         $has_diplom_original = $content['has_diplom_original'];
 
-        $direction_links = $content['direction_links'];
+        $direction_links = $content['directions_links'];
 
         DB::update('update abiturients set has_diplom_original = ? where id = ?',
          [$has_diplom_original, $target_abiturient_id]);
@@ -150,6 +152,7 @@ class AdminController extends Controller
                 'place' => 0,
                 'mark' => 0,
                 'admission_status' => 'request_in_progress',
+                'prioritet_number' => $link['prioritet_number'],
                 'has_diplom_original' => $has_diplom_original
             ]);
 
@@ -259,7 +262,8 @@ class AdminController extends Controller
                     $current_item['id'], 
                     $full_name,
                     $current_item['is_requested'],
-                    $current_item['is_enrolled']);
+                    $current_item['is_enrolled'],
+                    $current_item['has_diplom_original']);
     
                 array_push($abiturients, $abiturientLink);
             }
@@ -308,7 +312,8 @@ class AdminController extends Controller
                     $current_item['id'], 
                     $full_name,
                     $current_item['is_requested'],
-                    $current_item['is_enrolled']);
+                    $current_item['is_enrolled'],
+                    $current_item['has_diplom_original']);
     
                 array_push($abiturients, $abiturientLink);
             }
@@ -357,7 +362,8 @@ class AdminController extends Controller
                     $current_item['id'], 
                     $full_name,
                     $current_item['is_requested'],
-                    $current_item['is_enrolled']);
+                    $current_item['is_enrolled'],
+                    $current_item['has_diplom_original']);
     
                 array_push($abiturients, $abiturientLink);
             }

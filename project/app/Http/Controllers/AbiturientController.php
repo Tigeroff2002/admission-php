@@ -244,6 +244,8 @@ class AbiturientController extends Controller
     {
         $basicAuthentificator = new BasicAuthentificator();
 
+        $old_request = $request;
+
         $auth_result = $basicAuthentificator->IsUserExistsAndTokenValid($request);
 
         if ($auth_result != null)
@@ -267,7 +269,9 @@ class AbiturientController extends Controller
 
         foreach ($places_db as $current_item)
         {
-            $abiturient_name = Abiturient::where('id', $current_item['abiturient_id'])->first();
+            $abiturient= Abiturient::where('id', $current_item['abiturient_id'])->first();
+
+            $abiturient_name = $abiturient['first_name'] . ' ' . $abiturient['second_name'];
 
             $place = new PlaceSnapshot(
                 $current_item['place'], 
@@ -281,7 +285,12 @@ class AbiturientController extends Controller
             array_push($places, $place);
         }
 
-        $placesContent = new DirectionSnapshotContent($direction_id, $direction_name, $places);
+        $placesContent = new DirectionSnapshotContent(
+            $direction_id, 
+            $direction_name, 
+            $direction['budget_places_number'],
+            $direction['min_ball'],
+            $places);
 
         $responseModel = new GetDirectionSnapshotResponse(
             $array['abiturient_id'], 

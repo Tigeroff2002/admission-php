@@ -12,8 +12,6 @@ class BasicAuthentificator
 {
     public function IsUserExistsAndTokenValid(Request $request) : ?JsonResponse
     {
-        $request->validate(['abiturient_id' => 'required', 'token' => 'required']);
-
         $json = $request->getContent();
 
         $array = json_decode($json, true);
