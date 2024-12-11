@@ -4,8 +4,8 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 
-header('Access-Control-Allow-Origin: http://localhost:3001');
-//header('Access-Control-Allow-Origin: http://localhost:43650');
+//header('Access-Control-Allow-Origin: http://localhost:3001');
+header('Access-Control-Allow-Origin: http://localhost:55351');
 //header('Access-Control-Allow-Origin: http://localhost:8080');
 header('Access-Control-Allow-Methods: *');
 header('Access-Control-Allow-Headers: *');

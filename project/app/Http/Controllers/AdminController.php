@@ -190,9 +190,7 @@ class AdminController extends Controller
 
         $array = json_decode($json, true);
 
-        $content = $array['content'];
-
-        $target_abiturient_id = $content['target_abiturient_id'];
+        $target_abiturient_id = $array['target_abiturient_id'];
 
         $targetAbiturient = Abiturient::where('id', $target_abiturient_id)->first(); 
 
@@ -216,7 +214,7 @@ class AdminController extends Controller
             return new JsonResponse(json_encode($failResponseModel), Response::HTTP_OK, [], true);
         }
 
-        $has_diplom_original = $content['has_diplom_original'];
+        $has_diplom_original = $array['has_diplom_original'];
 
         DB::update('update abiturients set has_diplom_original = ? where id = ?',
          [$has_diplom_original, $target_abiturient_id]);
