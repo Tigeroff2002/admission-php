@@ -28,7 +28,7 @@ class BasicAuthentificator
             return new JsonResponse(json_encode($failResponseModel), Response::HTTP_BAD_REQUEST, [], true);          
         }
 
-/*         if ($existed_user['token'] != $array['token'])
+        if ($existed_user['token'] != $array['token'])
         {
             $failResponseModel = new DefaultResponse(
                 null,
@@ -36,7 +36,7 @@ class BasicAuthentificator
                 false);
 
             return new JsonResponse(json_encode($failResponseModel), Response::HTTP_BAD_REQUEST, [], true);                
-        } */
+        }
 
         return null;
     }
